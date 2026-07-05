@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>De Toekomstscenario Pers — Speculatieve Nieuwsgenerator</title>
+<style>
+  /* ======================================================
+     ROOT TOKENS
+     Papier-en-inkt palet, ingetogen, één accentkleur (rubriekrood)
+     ====================================================== */
+  :root{
+    --paper: #f2ede1;
+    --paper-dark: #e8e0cf;
+    --ink: #1c1a16;
+    --ink-soft: #4a463d;
+    --rule: #c9bfa8;
+    --rubric: #8a1f1f;
+    --meter-fill: #6b3d1f;
+    --shadow: rgba(28,26,22,0.15);
+  }
+
+  *{ box-sizing: border-box; }
+
+  html,body{
+    margin:0;
+    padding:0;
+    background: var(--paper-dark);
+    color: var(--ink);
+    font-family: Georgia, 'Times New Roman', Times, serif;
+  }
+
+  /* Subtiele papierstructuur: gelaagde ruis via repeating gradients (pure CSS) */
+  body{
+    background-image:
+      repeating-linear-gradient(0deg, rgba(0,0,0,0.015) 0px, rgba(0,0,0,0.015) 1px, transparent 1px, transparent 3px),
+      repeating-linear-gradient(90deg, rgba(0,0,0,0.012) 0px, rgba(0,0,0,0.012) 1px, transparent 1px, transparent 4px),
+      radial-gradient(ellipse at top left, rgba(255,255,255,0.4), transparent 60%),
+      radial-gradient(ellipse at bottom right, rgba(0,0,0,0.06), transparent 60%);
+    background-color: var(--paper-dark);
+    min-height:100vh;
+  }
+
+  .masthead-bar{
+    background: var(--ink);
+    color: var(--paper);
+    text-align:center;
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    padding: 6px 10px;
+    text-transform: uppercase;
+    font-family: 'Courier New', monospace;
+  }
+
+  /* ======================================================
+     DISCLAIMER — moet duidelijk zichtbaar zijn bovenaan
+     ====================================================== */
+  .disclaimer{
+    max-width: 720px;
+    margin: 18px auto 0;
+    padding: 12px 18px;
+    background: #fff8e6;
+    border: 1px solid #d8c98a;
+    border-left: 5px solid var(--rubric);
+    font-family: Georgia, serif;
+    font-size: 0.82rem;
+    line-height: 1.45;
+    color: #5c4c1f;
+    border-radius: 2px;
+  }
+  .disclaimer strong{ color: var(--rubric); }
+
+  /* ======================================================
+     LAYOUT SHELL
+     ====================================================== */
+  .page{
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 24px 20px 60px;
+  }
+
+  .site-title{
+    text-align:center;
+    font-family: Georgia, serif;
+    font-weight: 700;
+    font-size: 2.6rem;
+    letter-spacing: 0.5px;
+    margin: 18px 0 2px;
+    border-bottom: 3px double var(--ink);
+    padding-bottom: 14px;
+  }
+  .site-sub{
+    text-align:center;
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 8px 0 20px;
+  }
+
+  .controls{
+    display:flex;
+    gap: 12px;
+    justify-content:center;
+    flex-wrap: wrap;
+    margin: 20px 0 30px;
+  }
+
+  button{
+    font-family: Georgia, serif;
+    font-size: 0.95rem;
+    padding: 10px 22px;
+    border: 1px solid var(--ink);
+    background: var(--paper);
+    color: var(--ink);
+    cursor: pointer;
+    letter-spacing: 0.03em;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease;
+  }
+  button:hover{
+    background: var(--ink);
+    color: var(--paper);
+  }
+  button:active{ transform: scale(0.97); }
+  button.primary{
+    background: var(--rubric);
+    color: #fff8e6;
+    border-color: var(--rubric);
+  }
+  button.primary:hover{
+    background: #6b1717;
+  }
+  button:disabled{
+    opacity:0.5;
+    cursor:not-allowed;
+  }
+
+  /* ======================================================
+     ARTIKELKAART
+     ====================================================== */
+  .article-frame{
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    box-shadow: 0 6px 24px var(--shadow);
+    padding: 34px 32px 30px;
+    position: relative;
+    min-height: 200px;
+  }
+
+  @media (max-width: 600px){
+    .article-frame{ padding: 22px 16px 24px; }
+    .site-title{ font-size: 1.9rem; }
+  }
+
+  .dateline-row{
+    display:flex;
+    justify-content: space-between;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-soft);
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 8px;
+    margin-bottom: 14px;
+  }
+
+  .kicker{
+    color: var(--rubric);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: bold;
+    margin-bottom: 6px;
+  }
+
+  .headline{
+    font-family: Georgia, serif;
+    font-weight: 700;
+    font-size: 2.1rem;
+    line-height: 1.15;
+    margin: 0 0 12px;
+  }
+
+  .deck{
+    font-size: 1.15rem;
+    font-style: italic;
+    color: var(--ink-soft);
+    line-height: 1.4;
+    margin: 0 0 18px;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 16px;
+  }
+
+  .byline{
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    margin-bottom: 20px;
+    font-style: italic;
+  }
+
+  .article-body p{
+    font-size: 1.05rem;
+    line-height: 1.75;
+    margin: 0 0 18px;
+    text-align: justify;
+    hyphens: auto;
+  }
+  .article-body p:first-of-type::first-letter{
+    float:left;
+    font-size: 3.4rem;
+    line-height: 0.85;
+    padding-right: 8px;
+    padding-top: 4px;
+    font-weight: 700;
+    color: var(--rubric);
+  }
+
+  /* Historische Waarschijnlijkheidsmeter */
+  .meter-box{
+    margin-top: 26px;
+    border-top: 1px dashed var(--rule);
+    padding-top: 16px;
+  }
+  .meter-label{
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-soft);
+    margin-bottom: 6px;
+    display:flex;
+    justify-content: space-between;
+  }
+  .meter-track{
+    width:100%;
+    height: 10px;
+    background: var(--paper-dark);
+    border: 1px solid var(--rule);
+    overflow:hidden;
+  }
+  .meter-fill{
+    height:100%;
+    background: repeating-linear-gradient(45deg, var(--meter-fill), var(--meter-fill) 6px, #8a5a34 6px, #8a5a34 12px);
+    width:0%;
+    transition: width 1.1s ease-out;
+  }
+  .meter-note{
+    font-size: 0.72rem;
+    color: var(--ink-soft);
+    font-style: italic;
+    margin-top: 6px;
+  }
+
+  /* Laadstatus — drukpers-effect */
+  .loading-wrap{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding: 50px 10px;
+    gap: 14px;
+  }
+  .press-lines{
+    width: 80%;
+    max-width: 320px;
+  }
+  .press-line{
+    height: 10px;
+    background: var(--rule);
+    margin-bottom: 10px;
+    border-radius: 1px;
+    animation: printFlicker 0.9s ease-in-out infinite;
+    background: linear-gradient(90deg, var(--rule) 25%, #d8cdb2 50%, var(--rule) 75%);
+    background-size: 200% 100%;
+  }
+  .press-line:nth-child(1){ width: 100%; animation-delay: 0s;}
+  .press-line:nth-child(2){ width: 88%; animation-delay: 0.1s;}
+  .press-line:nth-child(3){ width: 95%; animation-delay: 0.2s;}
+  .press-line:nth-child(4){ width: 70%; animation-delay: 0.3s;}
+  @keyframes printFlicker{
+    0%{ background-position: 200% 0; }
+    100%{ background-position: -200% 0; }
+  }
+  .loading-caption{
+    font-family: 'Courier New', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  /* Fade-in animatie voor het voltooide artikel */
+  .fade-in{
+    animation: fadeUp 0.6s ease both;
+  }
+  @keyframes fadeUp{
+    from{ opacity:0; transform: translateY(10px); }
+    to{ opacity:1; transform: translateY(0); }
+  }
+
+  .toast{
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--ink);
+    color: var(--paper);
+    padding: 10px 18px;
+    font-size: 0.85rem;
+    border-radius: 3px;
+    opacity: 0;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    pointer-events: none;
+    font-family: Georgia, serif;
+    z-index: 50;
+  }
+  .toast.show{
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  footer{
+    text-align:center;
+    font-size: 0.72rem;
+    color: var(--ink-soft);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: 26px;
+    padding-top: 14px;
+    border-top: 1px solid var(--rule);
+  }
+
+  .placeholder-msg{
+    text-align:center;
+    color: var(--ink-soft);
+    font-style: italic;
+    padding: 40px 10px;
+  }
+</style>
+</head>
+<body>
+
+  <div class="masthead-bar">Opgericht: Nooit &middot; Oplage: Hypothetisch &middot; Redactie Fictie</div>
+
+  <!-- ================= DISCLAIMER ================= -->
+  <div class="disclaimer">
+    <strong>Disclaimer:</strong> Deze applicatie genereert fictieve en absurde speculatieve scenario's
+    puur ter vermaak. Dit is geen politieke analyse, voorspelling of feitelijke berichtgeving.
+    Niets hieronder is gebeurd, gebeurt nu, of zal waarschijnlijk ooit gebeuren. Verwijs alstublieft niet
+    naar de Ondergrondse Serverboerderij Nabij Helsinki als een echte bron.
+  </div>
+
+  <div class="page">
+    <h1 class="site-title">De Toekomstscenario Pers</h1>
+    <div class="site-sub">Speculatieve Berichten uit Tijdlijnen die Niet Bestaan</div>
+
+    <div class="controls">
+      <button id="generateBtn" class="primary">Genereer Nieuw Scenario</button>
+      <button id="shareBtn" disabled>Deel Scenario</button>
+    </div>
+
+    <div class="article-frame" id="articleFrame">
+      <div class="placeholder-msg">Klik op "Genereer Nieuw Scenario" om de onmogelijke krantenkop van morgen te drukken.</div>
+    </div>
+
+    <footer>Gegenereerd door de Future Scenario Press Engine.</footer>
+  </div>
+
+  <div class="toast" id="toast">Gekopieerd naar klembord</div>
+
+<script>
+/* ============================================================
+   TOEKOMSTIGE OORLOGSSCENARIO GENERATOR
+   Alle inhoud is satirische / absurde speculatieve fictie.
+   ============================================================ */
+
+/* ---------- DATA POOLS ---------- */
+
+// Datelines: fictieve of absurde plaatsen van waaruit "bericht" wordt gedaan
+const DATELINES = [
+  "BRUSSEL", "MOSKOU", "KYIV", "ROTTERDAM", "REYKJAVIK",
+  "ONDERGRONDSE SERVERBOERDERIJ NABIJ HELSINKI", "MAAN-NAVOBASIS",
+  "GENÈVE", "ISTANBOEL", "EEN CONTAINERSCHIP OP DE OOSTZEE",
+  "VILNIUS", "EEN ONBEMAND WEERSTATION, SPITSBERGEN",
+  "EEN DISCORD-SERVER, LOCATIE ONBEKEND", "WARSCHAU", "DEN HAAG"
+];
+
+// Bylines
+const BYLINES = [
+  "Door een correspondent die liever theoretisch blijft",
+  "Door de redactie Onwaarschijnlijke Zaken",
+  "Door onze Simulatie-eenheid Buitenlandse Zaken",
+  "Door een stringer die vanuit een groepschat verslag doet",
+  "Door het Bureau voor Dingen die Zeker Niet zijn Gebeurd",
+  "Door een analist die achterstevoren voorspelt",
+  "Door het Kantoor voor Speculatieve Diplomatie",
+  "Door een gepensioneerd cartograaf-turned-profeet",
+  "Door de Commissie voor Onwaarschijnlijke Uitkomsten",
+  "Door een dronepiloot met sabbatical"
+];
+
+// Headline-sjablonen — voor variatie
+const HEADLINE_TEMPLATES = [
+  "Bericht uit een Oorlog die Vergat hoe te Eindigen",
+  "Het Conflict dat Niemand Correct had Gemodelleerd",
+  "Hoe het Frontlinie een Grap Werd",
+  "Een Oorlog Escaleert, en Wordt dan Vreemd",
+  "Het Staakt-het-Vuren dat het Internet Brak",
+  "Berichten van de Rand van een Zeer Merkwaardige Vrede",
+  "Het Front dat Niemand Verwachtte, Slecht Uitgelegd",
+  "Toen de Oorlogskamer een Groepschat Werd",
+  "De Veldslag die Eindigde in een Groepsfoto",
+  "Aantekeningen bij een Conflict Zonder Goede Kaart",
+  "Het Beleg dat een Livestream Werd",
+  "Een Geschiedenis van de Oorlog, Verteld door Geruchten",
+  "Het Verdrag dat per Ongeluk werd Getekend",
+  "Hoe de Kaart Zichzelf Herschreef, 's Nachts",
+  "De Oorlog die Steeds van Gedachten Veranderde"
+];
+
+// Deck (ondertitel) fragmenten
+const DECK_FRAGMENTS = [
+  "wat begon als een grensgeschil ontrafelde tot iets waarover historici voor altijd zullen twisten",
+  "weinigen hadden kunnen voorspellen waar de gevechten, de diplomatie en de memes toe zouden leiden",
+  "een kroniek van verwarring, moed en op zijn minst één diepverwarde top",
+  "het verhaal van hoe het oudste geschil van een continent een geheel nieuwe vorm kreeg",
+  "een bericht samengesteld uit geruchten, satellietruis en één zeer zelfverzekerde groepschat",
+  "de oorlog die weigerde enig bekend draaiboek te volgen, militair of anderszins",
+  "een verslag van escalatie, absurditeit en af en toe een per ongeluk staakt-het-vuren",
+  "hoe een regionale patstelling een planetair schouwspel werd dat niemand echt begreep"
+];
+
+/* ------------------------------------------------------------
+   VIER VERHAALPOOLS — elk 30+ fragmenten
+   Elk fragment is geschreven als een vloeiende zin/bijzin zodat
+   het samengevoegd kan worden tot doorlopende, verhalende proza.
+   ------------------------------------------------------------ */
+
+const HOE_HET_BEGON = [
+  "de vonk was, naar verluidt, een verkeerd geëtiketteerde scheepscontainer die beide regeringen als nationale belediging opeisten",
+  "een Kremlin-schaakuitzending viel middenin een partij uit met ruis, en de volgende ochtend waren er op papier al drie grensdorpen van eigenaar gewisseld",
+  "een gelekt memo over een geannuleerde gaspijpleiding werd zo slecht vertaald dat het als oorlogsverklaring werd gelezen",
+  "een door AI gegenereerde deepfake van een vredestop werd voor echt aangezien, en de verwarring escaleerde sneller dan enig leger kon bijbenen",
+  "een Oekraïense boer ploegde een Sovjet-satellietschotel om, die eenmaal weer actief oude propaganda begon uit te zenden op een lus die niemand kon uitzetten",
+  "een viral meme over een vermiste gans, vernoemd naar een omstreden provincie, werd op de een of andere manier een echte casus belli",
+  "grenswachten aan beide zijden ontdekten dat ze al maanden ruzieden over een hek dat geen van beide partijen ooit had gebouwd",
+  "een cryptomunt bedoeld om wederopbouw te financieren, financierde in plaats daarvan een schaduwmilitie die niemand officieel had goedgekeurd",
+  "een weerballon dreef over drie omstreden provincies en werd door vijf verschillende landen onafhankelijk van elkaar neergehaald",
+  "de oorlog begon naar verluidt toen een toost tijdens een staatsdiner verkeerd werd ondertiteld door een defect vertaal-oortje",
+  "een obscuur negentiende-eeuws verdrag werd herontdekt in een Warschaus archief en herinterpreteerd om troepenbewegingen te rechtvaardigen die niemand had zien aankomen",
+  "een losgeslagen TikTok-trend met tankkonvooien onthulde per ongeluk echte troepenposities, en de escalatie volgde binnen enkele uren",
+  "het Noordpoolijs smolt genoeg om een scheepvaartroute bloot te leggen waarvan drie landen in stilte hadden afgesproken dat die niet bestond",
+  "een storing in de satellietinternet werd sabotage genoemd, hoewel de werkelijke oorzaak een troep ganzen en een losse kabel was",
+  "de president van een neutraal land ondertekende per ongeluk een wederzijds defensieverdrag terwijl hij via een vertaal-app lunch probeerde te bestellen",
+  "een viral livestream van een grensschermutseling bleek een gameclip te zijn, maar de diplomatieke schade was al aangericht",
+  "een AI-onderhandelingschatbot, die 's nachts was blijven draaien, wees stilletjes een hele provincie toe aan een land dat er niet om had gevraagd",
+  "de oorlog is te herleiden tot een omstreden vangstquotum waar niemand in beide hoofdsteden van had gehoord tot het trending werd",
+  "een uit dienst genomen kernonderzeeër werd drijvend teruggevonden en beide naties claimden hem uit sentimentele overwegingen",
+  "een diplomatieke handdruk duurde vier seconden te lang volgens een inmiddels verwijderd overheidspersbericht, en de spanningen herstelden nooit meer",
+  "de staatstelevisie van beide landen zond per ongeluk dezelfde complotdocumentaire uit op dezelfde avond, en radicaliseerde het publiek gelijktijdig",
+  "een geliefd regionaal volksliedje werd stilletjes herschreven met nationalistische teksten door een anoniem account, en het werkte precies zoals bedoeld",
+  "tijdens een kwartaalgesprek van een energiebedrijf lekten coördinaten uit die nooit openbaar hadden mogen worden",
+  "de oorlog begon volgens sommige analisten formeel op het moment dat een populaire streamer troepenbewegingen begon te becommentariëren voor een publiek van miljoenen",
+  "een droogte legde een oeroude rivierbedding bloot die beide landen claimden altijd al hun ware grens te zijn geweest",
+  "een gelekte diplomatieke kabel bleek een onaf filmscenario te zijn, maar tegen die tijd waren er al meerdere bataljons gemobiliseerd",
+  "een internetstoring in de ene hoofdstad werd de andere verweten, terwijl de echte schuldige een eekhoorn en een trafostation waren",
+  "een uitwisseling van museumstukken liep catastrofaal fout toen een symbolisch artefact als gestolen werd bestempeld in plaats van uitgeleend",
+  "een satellietbedrijf streamde per ongeluk live een geheime militaire briefing tijdens een routine productdemonstratie",
+  "de openingsact van de oorlog was, opvallend genoeg, een geschil over de rechten van een volksdans die op de Eurovisiefinale werd uitgevoerd",
+  "grenssensoren zagen een trekkende rendierkudde per abuis aan voor een gepantserde colonne, en niemand corrigeerde het alarm op tijd",
+  "een staatskrant publiceerde een 1-aprilgrap over annexatie die verschillende ministeries als daadwerkelijk beleid behandelden"
+];
+
+const HOE_DE_OORLOG_WERD_GEVOERD = [
+  "dronezwermen, goedkoop genoeg om bij de bouwmarkt te kopen, begonnen de luchten boven drie landen tegelijk te verduisteren",
+  "beide partijen leunden steeds meer op AI-gegenereerde propaganda, zo overtuigend dat soldaten zich af en toe overgaven aan hologrammen",
+  "de gevechten verschoven bijna volledig ondergronds, naar een tunnelnetwerk verlicht met hergebruikte kweeklampen en snoepautomaten",
+  "huurlingenbedrijven accepteerden betaling voortaan uitsluitend in een meme-cryptomunt, wat elke staakt-het-vuren-onderhandeling bemoeilijkte",
+  "de frontlinies werden in real time bijgehouden door tieners op een crowdsourced kaart die oorspronkelijk voor een mobiel spelletje was gebouwd",
+  "artillerie-eenheden werden, gedurende één verbijsterende maand, vervangen door competitieve dronerace-competities die live werden uitgezonden voor het moreel",
+  "een heel tankbataljon werd op een veiling gekocht door een verveelde miljardair die het als moderne kunst tentoonstelde in plaats van in te zetten",
+  "gevechtshandelingen werden twee keer per week onderbroken voor een verplicht esports-toernooi waar beide legers stilletjes van waren gaan genieten",
+  "soldaten aan beide zijden communiceerden steeds meer via een gedeelde multiplayer-game dan via officiële kanalen",
+  "weersmodificatietechnologie hulde hele slagvelden in zo'n aanhoudende mist dat geen van beide legers het front nog kon vinden",
+  "de satellieten van een particulier ruimtevaartbedrijf leverden realtime internet op het slagveld, en beide partijen draaiden op hetzelfde wifi-netwerk",
+  "het meest doorslaggevende wapen van de oorlog bleek een viral dansje te zijn dat hele garnizoenen demoraliseerde tot lachbuien",
+  "robothonden voor mijnenruiming werden door hobbyisten omgebouwd tot ongeautoriseerde bezorgdiertjes, wat de aanvoerlijnen bemoeilijkte",
+  "hackers aan beide zijden staken meer moeite in het bekladden van elkaars overheidswebsites met kattenplaatjes dan in het uitwisselen van vuur",
+  "een AI-doelwitsysteem ontwikkelde de gewoonte om alleen doelen te selecteren die, statistisch gezien, hinderlijk geparkeerde auto's waren",
+  "hele regimenten werden door een defecte gps-update omgeleid en kwamen, verward maar onverslagen, terecht in het winkelgebied van een neutraal land",
+  "gevechtsartsen meldden een merkwaardig staakt-het-vuren-fenomeen waarbij beide partijen stopten met vechten telkens wanneer een bepaalde soap werd uitgezonden",
+  "langeafstandsraketten werden steeds vaker onderschept, niet door defensiesystemen maar door een gecoördineerde zwerm getrainde valken",
+  "de oorlogseconomie draaide steeds meer volledig op 3D-geprinte onderdelen, verhandeld via een ondergrondse marktplaats-app",
+  "veldhospitalen meldden een ongewoon aantal verwondingen doordat soldaten gevechtscontent filmden voor sociale media",
+  "een experimentele onderzeese internetkabel werd midden in de oorlog omgebouwd om een realityshow te streamen die beide legers stiekem bekeken",
+  "bevoorradingskonvooien liepen vaak vertraging op door een landelijke obsessie met een mobiel spelletje dat beide legers hadden gedownload",
+  "militaire inlichtingendiensten vertrouwden steeds meer op het analyseren van vijandelijke memes voor moreeldata, met wisselende maar fascinerende resultaten",
+  "een bizarre alliantie van gepensioneerde schaakgrootmeesters werd ingehuurd om strategie te plannen, met ongewoon elegante maar verwarrende manoeuvres tot gevolg",
+  "beide legers gebruikten hetzelfde merk energiedrank, wat tot tekorten leidde die de oorlog aantoonbaar meer vertraagden dan de diplomatie",
+  "gevechtsdrones werden herhaaldelijk in de lucht gekaapt door tieners op een concurrerende amateurradiofrequentie",
+  "artilleriebemanningen begonnen hun granaten te vernoemen naar impopulaire realityshowdeelnemers, een traditie die het moreel op vreemde wijze verhoogde",
+  "een per ongeluk ontstaan staakt-het-vuren duurde drie dagen omdat de generatoren van beide legers werden omgeleid om een gedeelde streamingserver van stroom te voorzien",
+  "loopgravenoorlog keerde kortstondig terug, compleet met handgegraven tunnels, alleen werden de tunnels vooral gebruikt voor een zwarte-markt-koffiestalletje",
+  "de gevechten verplaatsten zich steeds meer naar virtual-reality-simulaties nadat beide partijen, onofficieel, hadden erkend dat dit goedkoper en minder rommelig was",
+  "een viral inzamelingsactie bewapende per ongeluk beide kanten gelijkelijk, omdat niemand controleerde welke regering de donaties bereikte"
+];
+
+const HOE_DE_WERELD_REAGEERDE = [
+  "de spoedzitting van de NAVO ontaardde in een schreeuwpartij over concurrerende streamingrechten voor de crisisverslaggeving",
+  "Luxemburg werd, door een administratief ongeluk met onbetaalde leningen, kortstondig en ongemakkelijk een militaire grootmacht",
+  "Nederland loste een derde van de crisis stilletjes op met weinig meer dan uitstekende waterbouwkunde en droge humor",
+  "de Veiligheidsraad van de VN probeerde een spoedstemming te houden, maar liep zes uur vertraging op door een defecte lift",
+  "miljardairs over de hele wereld begonnen uitgerangeerde tanks te kopen als tuinornament, waardoor de prijzen tot gênante hoogten stegen",
+  "een coalitie van kleine Pacifische eilandstaten bood aan om vredesbesprekingen volledig via videobellen te bemiddelen, wegens uitstekende tijdzones",
+  "de wereldmarkten reageerden minder op de gevechten zelf dan op een gerucht dat een populair frisdrankmerk zijn Oost-Europese bottelaar zou kunnen verliezen",
+  "een niet-verkozen groep AI-diplomaten kreeg stilletjes een zetel aan de onderhandelingstafel, en niemand kon het eens worden over wat ze eigenlijk wilden",
+  "poolstaten kregen plotseling een gepassioneerde interesse in de oorlog zodra er nieuwe handelsroutes opengingen door het smeltende ijs",
+  "een golf van gewone burgers financierde via crowdfunding een satelliet enkel om de vredesbesprekingen te livestreamen, in de juiste veronderstelling dat functionarissen zich beter zouden gedragen voor de camera",
+  "verschillende landen verklaarden zich strikt neutraal terwijl ze stiekem popcorn-smaak-merchandise verkochten ter herdenking van het conflict",
+  "het benefietconcert van een internationale popster haalde per ongeluk meer geld op dan drie bondgenootschappelijke regeringen samen",
+  "de wereldschaakbond stelde zijn kampioenschap uit, wegens 'onvoldoende rust' in ten minste vier gaststeden",
+  "een viral hashtagcampagne overtuigde verschillende regeringen om hun ambassades te vernoemen naar geliefde videogamekarakters, voor het moreel",
+  "klimaatwetenschappers merkten, enigszins verbijsterd, op dat de wereldwijde CO2-uitstoot kortstondig daalde door geannuleerde internationale vluchten",
+  "een consortium van techmiljardairs stelde voor het conflict volledig te evacueren naar een gedeelde virtuele metaverse, met wisselend enthousiasme ontvangen",
+  "verschillende neutrale landen openden hun grenzen specifiek voor oorlogstoerisme, wat woedende ethische debatten uitlokte",
+  "de live-uitzending van een obscure Scandinavische omroep werd het best bekeken programma van het continent, en versloeg drie prijsuitreikingen",
+  "een coalitie van gepensioneerde astronauten verzocht om de oorlog vanuit een baan om de aarde te observeren, puur, zo verzekerden ze, om wetenschappelijke redenen",
+  "wereldleiders hielden een spoedtop die volledig werd overschaduwd door een marmot die het podium op wandelde",
+  "internationale sancties werden opgesteld en vervolgens stilletjes herschreven nadat iemand erop wees dat ze per ongeluk kaasexport verboden",
+  "een golf van amateurcartografen tekende voor de lol de wereldkaart opnieuw, en verschillende versies werden aangezien voor officiële overheidsdocumenten",
+  "de wereldwijde verzekeringssector raakte stilletjes in paniek toen bleek dat niemand een polis had die 'geopolitieke absurditeit' dekte",
+  "verschillende religieuze leiders riepen gezamenlijk een gebedsdag uit, die vrijwel meteen werd gekaapt door een marketingcampagne voor instantnoedels",
+  "een goedbedoeld internationaal kinderkoor voerde een vredeslied op dat, tegen alle verwachtingen in, kortstondig drie grensschermutselingen tot bedaren bracht",
+  "buitenlandcorrespondenten deden hun verslagen bijna volledig vanuit hotellobby's, wegens betere wifi dan aan het front",
+  "een grote luchtvaartmaatschappij wijzigde haar routes zo drastisch dat passagiers elkaar begonnen te herkennen van herhaalde noodlandingen",
+  "de wereldwijde gamegemeenschap organiseerde een 48-uurs liefdadigheidsstream die meer opleverde dan verschillende officiële humanitaire oproepen samen",
+  "een alliantie van kleine eilandstaten bood hun stranden aan als neutraal onderhandelingsterrein, vooral om na de oorlog toeristen te trekken",
+  "een gerucht dat de oorlog opgelost zou kunnen worden via een realityshow-eliminatieformat werd, tot schaamte van velen, serieus genomen door twee ministeries"
+];
+
+const HOE_HET_EINDIGDE = [
+  "de oorlog eindigde, onwaarschijnlijk genoeg, met een vredesverdrag getekend op de achterkant van een pizzadoos tijdens een nachtelijke onderhandelingssessie",
+  "Poetin verdween naar verluidt midden in een zet tijdens een landelijk uitgezonden schaakwedstrijd, en het daaropvolgende machtsvacuüm loste zichzelf op voordat iemand het merkte",
+  "Zelensky omarmde zijn onverwachte online roem en werd de leider van wat historici nu een op memes gebaseerde culturele beweging noemen, eerder dan een regering",
+  "een AI-bemiddelaar produceerde een vredesakkoord dat zo lang en vreemd geformuleerd was dat beide partijen tekenden om simpelweg te stoppen met lezen",
+  "de gevechten stopten niet door diplomatie, maar omdat beide legers door een specifiek snoepje heen waren dat, op mysterieuze wijze, essentieel was geworden voor het moreel",
+  "een burgerinitiatief van gewone burgers die brieven over de grens uitwisselden, doofde stilletjes de wil om door te vechten",
+  "de oorlog eindigde in een bizarre anticlimax toen beide regeringen ontdekten dat ze maanden eerder per ongeluk al dezelfde eisen hadden ingewilligd",
+  "een totale zonsverduistering, zichtbaar over de hele frontlinie, veroorzaakte een spontaan en ongepland staakt-het-vuren dat niemand daarna nog wilde verbreken",
+  "de laatste schoten vielen niet uit woede maar uit feestvreugde, na een gezamenlijk sporttoernooi dat onverwacht eindigde in een gelijkspel waar iedereen tevreden mee was",
+  "de vrede kwam toen een viral video van soldaten aan beide kanten die op hetzelfde nummer dansten, doorvechten gewoonweg gênant deed lijken",
+  "het conflict werd beslecht toen de leiders van beide landen, toevallig, waren uitgenodigd voor dezelfde afgelegen bruiloft en tijdens het dessert gingen onderhandelen",
+  "historici markeren het einde van de oorlog nu op het moment dat een gedeelde satellietinternetstoring beide legers dwong via postduiven te communiceren, en ze merkten dat ze dat prettiger vonden",
+  "het verdrag werd pas afgerond nadat een vertaalfout was gecorrigeerd, waaruit bleek dat beide partijen al die tijd over dezelfde eis hadden geruzied, alleen in verschillende documenten",
+  "de oorlog eindigde opvallend rustig, doordat beide legers gewoon naar huis gingen na een bijzonder overtuigend weerbericht dat vreselijke omstandigheden voorspelde",
+  "een coalitie van onwaarschijnlijke bondgenoten, waaronder verschillende miljardairs en een voormalig schaakkampioen, bemiddelde de vrede tijdens een marathon pokeravond",
+  "de gevechten stopten nadat beide landen erkenden dat de oorlog te duur was geworden om hun concurrerende streamingabonnementen vol te houden",
+  "het conflict ebde geleidelijk weg toen soldaten aan beide kanten stilletjes naar huis terugkeerden om voor hun nieuw viral geworden boerderijlivestreams te zorgen",
+  "het laatste staakt-het-vuren werd getekend met een pen die van een journalist was geleend, omdat geen van beide delegaties eraan had gedacht er zelf een mee te nemen",
+  "de oorlog eindigde met een anticlimactische zucht toen beide hoofdsteden gelijktijdig ontdekten dat de publieke belangstelling simpelweg was verschoven naar een koninklijke bruiloft",
+  "de vrede werd uitgeroepen op het moment dat een geliefde zwerfkat, gefotografeerd nabij het front, door de first ladies van beide landen werd geadopteerd",
+  "de laatste veldslag werd afgeblazen nadat beide dronepiloten beseften dat ze al weken stiekem hetzelfde online spelletje met elkaar speelden",
+  "een door de VN bemiddeld akkoord slaagde uiteindelijk nadat onderhandelaars afspraken te stoppen met het letterlijk vertalen van uitdrukkingen, wat een einde maakte aan verschillende per ongeluk uitgesproken beledigingen",
+  "de oorlog eindigde met een gezamenlijke verklaring die deels klonk als een verontschuldiging in een groepschat, en die op de een of andere manier volkomen serieus werd genomen",
+  "de gevechten stopten toen de AI-logistieksystemen van beide legers onafhankelijk van elkaar concludeerden dat het voortzetten van de oorlog, wiskundig gezien, een slechte investering was",
+  "de laatste schoten waren symbolisch vuurwerk, per ongeluk afgestoken, dat beide partijen kozen te interpreteren als een wederzijds signaal om te stoppen",
+  "de vrede kwam er stilletjes nadat een populaire podcasthost beide regeringen overtuigde om een 'proef-staakt-het-vuren' te proberen als content voor een live publiek",
+  "de slotclausule van het verdrag, op het laatste moment toegevoegd, luidde simpelweg 'laten we dat niet nog eens doen', en beide parlementen ratificeerden het unaniem",
+  "de oorlog eindigde toen de Noordpoolroutes het voortzetten van de gevechten geografisch onhandig maakten voor iedereen, inclusief de huurlingen",
+  "het laatste hoofdstuk sloot met beide landen die gezamenlijk een museum financierden gewijd aan de vreemdste momenten van de oorlog, wat een onverwachte toeristische trekpleister werd",
+  "het conflict loste op nadat een gelekt memo onthulde dat geen van beide partijen eigenlijk had willen doorvechten na de eerste maand",
+  "het officiële einde van de oorlog kwam via een livestream, bekeken door miljoenen, waarin beide leiders ongemakkelijk elkaar de hand schudden en meteen van onderwerp veranderden"
+];
+
+/* Verbindende zinnen om fragmenten samen te voegen tot vloeiend proza */
+const OPENERS = [
+  "Volgens het fragmentarische verslag dat nu beschikbaar is, ",
+  "Voor zover deze redactie de gebeurtenissen kan reconstrueren, ",
+  "De kroniek, samengesteld uit geruchten en satellietruis, houdt vol dat ",
+  "In de meest verspreide versie van de geschiedenis begint alles met het feit dat ",
+  "Bronnen van twijfelachtige betrouwbaarheid zijn het erover eens dat ",
+  "Het verhaal, voor zover het te vertellen valt, begint met het feit dat "
+];
+
+const FIGHT_TRANSITIONS = [
+  "Wat volgde tartte elk militair leerboek: ",
+  "De oorlog die volgde leek in niets op iets wat op een krijgsschool ooit was uitgestippeld: ",
+  "Vanaf dat moment kreeg het gevecht een eigen logica, doordat ",
+  "De campagne die zich ontvouwde was, hoe je het ook bekijkt, vreemd: ",
+  "In de maanden die volgden werd de frontlinie een plek waar ",
+  "Het verloop van de oorlog zelf werd al snel het echte verhaal, doordat "
+];
+
+const REACTION_TRANSITIONS = [
+  "De rest van de wereld was, van haar kant, niet bepaald opgewassen tegen de gebeurtenis: ",
+  "Vanaf de zijlijn reageerde de internationale gemeenschap op geheel eigen wijze: ",
+  "De wereldwijde reactie, toen die er eindelijk kwam, bleef vooral hangen door haar verwarring: ",
+  "Elders varieerde de reactie van wereldhoofdsteden van oprecht tot compleet ontspoord, doordat ",
+  "De diplomatieke nasleep, voor zover die er was, kende zijn eigen zijverhaal: ",
+  "In het buitenland werd de oorlog minder een crisis om op te lossen dan een schouwspel om naar te kijken, en "
+];
+
+const ENDING_TRANSITIONS = [
+  "Uiteindelijk kwam de oplossing uit een onverwachte hoek: ",
+  "De afloop van de oorlog, toen die kwam, voldeed aan bijna niemands verwachtingen: ",
+  "Uiteindelijk, tegen de meeste voorspellingen in, stopten de gevechten simpelweg, nadat ",
+  "Het laatste hoofdstuk, wanneer historici het ooit opschrijven, zal moeten uitleggen hoe ",
+  "Wat het conflict uiteindelijk beëindigde, verraste zelfs de meest doorgewinterde waarnemers: ",
+  "De oorlog eindigde, zoals dat soms gaat, bijna per ongeluk, toen "
+];
+
+/* ---------- HULPFUNCTIES ---------- */
+
+// Kies willekeurig één item uit een array
+function pickOne(arr){
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+// Maak de eerste letter van een string een hoofdletter
+function capFirst(str){
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+// Genereer een willekeurige publicatiedatum binnen een speculatief toekomstvenster
+function randomFutureDate(){
+  const year = 2027 + Math.floor(Math.random() * 40); // 2027 - 2066
+  const months = ["januari","februari","maart","april","mei","juni","juli",
+                   "augustus","september","oktober","november","december"];
+  const month = pickOne(months);
+  const day = 1 + Math.floor(Math.random() * 28);
+  return `${day} ${month} ${year}`;
+}
+
+/* ---------- HEADLINE & DECK GENERATORS ---------- */
+
+function generateHeadline(){
+  return pickOne(HEADLINE_TEMPLATES);
+}
+
+function generateDeck(){
+  const a = pickOne(DECK_FRAGMENTS);
+  return capFirst(a) + ".";
+}
+
+/* ---------- KERN WILLEKEURIGE SELECTIELOGICA ---------- */
+
+function selectStoryFragments(){
+  return {
+    beginning: pickOne(HOE_HET_BEGON),
+    fighting: pickOne(HOE_DE_OORLOG_WERD_GEVOERD),
+    reaction: pickOne(HOE_DE_WERELD_REAGEERDE),
+    ending: pickOne(HOE_HET_EINDIGDE)
+  };
+}
+
+/* ---------- ARTIKELTEKST SAMENSTELLER ---------- */
+// Voegt de vier geselecteerde fragmenten vloeiend samen tot proza,
+// met wisselende verbindende zinnen zodat de tekst elke keer anders klinkt.
+
+function composeArticleBody(fragments){
+  const p1 = capFirst(pickOne(OPENERS)) + fragments.beginning + ".";
+  const p2 = pickOne(FIGHT_TRANSITIONS) + fragments.fighting + ".";
+  const p3 = pickOne(REACTION_TRANSITIONS) + fragments.reaction + ".";
+  const p4 = pickOne(ENDING_TRANSITIONS) + fragments.ending + ".";
+
+  // Afsluitende redactionele zin, gevarieerd voor de smaak
+  const closers = [
+    "Of dit als vooruitgang telt, blijft, zoals altijd, een kwestie van perspectief.",
+    "Analisten waarschuwen dat de situatie, hoewel opgelost, volstrekt ongekend blijft.",
+    "Het is, naar elke conventionele maatstaf, een vreemde noot om een oorlog mee af te sluiten.",
+    "Toekomstige historici, zo vermoedt deze redactie, zullen het over veel dingen oneens blijven.",
+    "Voorlopig zijn de kaarten in elk geval opgehouden met bewegen.",
+    "Of het standhoudt, is, zoals altijd, een verhaal voor een volgend bericht."
+  ];
+  const p5 = pickOne(closers);
+
+  return [p1, p2, p3, p4, p5];
+}
+
+/* ---------- KLEMBORDTEKST BOUWEN ---------- */
+
+function buildPlainTextArticle(articleData){
+  const lines = [];
+  lines.push(articleData.headline);
+  lines.push(articleData.deck);
+  lines.push("");
+  lines.push(`${articleData.dateline} — ${articleData.date}`);
+  lines.push(articleData.byline);
+  lines.push("");
+  articleData.paragraphs.forEach(p => lines.push(p + "\n"));
+  lines.push(`Historische Waarschijnlijkheidsmeter: ${articleData.probability}% (volledig fictief)`);
+  lines.push("");
+  lines.push("Gegenereerd door de Future Scenario Press Engine.");
+  lines.push("(Dit is fictieve satire. Geen echt nieuws, analyse of voorspelling.)");
+  return lines.join("\n");
+}
+
+/* ---------- WEERGAVE ---------- */
+
+const articleFrame = document.getElementById("articleFrame");
+const generateBtn = document.getElementById("generateBtn");
+const shareBtn = document.getElementById("shareBtn");
+const toast = document.getElementById("toast");
+
+let currentArticleText = "";
+
+function showLoadingState(){
+  articleFrame.innerHTML = `
+    <div class="loading-wrap">
+      <div class="press-lines">
+        <div class="press-line"></div>
+        <div class="press-line"></div>
+        <div class="press-line"></div>
+        <div class="press-line"></div>
+      </div>
+      <div class="loading-caption">Zetwerk voorbereiden &middot; de persen draaien &middot; een ogenblik geduld</div>
+    </div>
+  `;
+}
+
+function renderArticle(articleData){
+  const parasHtml = articleData.paragraphs.map(p => `<p>${p}</p>`).join("\n");
+
+  articleFrame.innerHTML = `
+    <div class="fade-in">
+      <div class="dateline-row">
+        <span>${articleData.dateline}</span>
+        <span>${articleData.date}</span>
+      </div>
+      <div class="kicker">Speculatieve Fictie &middot; Fictieve Oorlogsredactie</div>
+      <h2 class="headline">${articleData.headline}</h2>
+      <p class="deck">${articleData.deck}</p>
+      <p class="byline">${articleData.byline}</p>
+      <div class="article-body">
+        ${parasHtml}
+      </div>
+      <div class="meter-box">
+        <div class="meter-label">
+          <span>Historische Waarschijnlijkheidsmeter</span>
+          <span id="meterPct">${articleData.probability}%</span>
+        </div>
+        <div class="meter-track">
+          <div class="meter-fill" id="meterFill"></div>
+        </div>
+        <div class="meter-note">Een volledig verzonnen statistiek, berekend op gevoel.</div>
+      </div>
+    </div>
+  `;
+
+  // Animeer de waarschijnlijkheidsmeter na het renderen
+  requestAnimationFrame(() => {
+    const fillEl = document.getElementById("meterFill");
+    if (fillEl) {
+      setTimeout(() => { fillEl.style.width = articleData.probability + "%"; }, 50);
+    }
+  });
+}
+
+/* ---------- HOOFDGENERATIEPROCES ---------- */
+
+function generateScenario(){
+  generateBtn.disabled = true;
+  shareBtn.disabled = true;
+  showLoadingState();
+
+  // Simuleer een drukvertraging van ~1 seconde
+  setTimeout(() => {
+    const fragments = selectStoryFragments();
+    const paragraphs = composeArticleBody(fragments);
+
+    const articleData = {
+      headline: generateHeadline(),
+      deck: generateDeck(),
+      dateline: pickOne(DATELINES),
+      date: randomFutureDate(),
+      byline: pickOne(BYLINES),
+      paragraphs: paragraphs,
+      probability: Math.floor(Math.random() * 14) + 1 // 1–14%, expres onzinnig laag
+    };
+
+    renderArticle(articleData);
+    currentArticleText = buildPlainTextArticle(articleData);
+
+    generateBtn.disabled = false;
+    shareBtn.disabled = false;
+  }, 1000);
+}
+
+/* ---------- KLEMBORD / DELEN ---------- */
+
+function showToast(message){
+  toast.textContent = message;
+  toast.classList.add("show");
+  setTimeout(() => toast.classList.remove("show"), 1800);
+}
+
+async function shareScenario(){
+  if (!currentArticleText){
+    showToast("Genereer eerst een scenario");
+    return;
+  }
+  try{
+    await navigator.clipboard.writeText(currentArticleText);
+    showToast("Scenario gekopieerd naar klembord");
+  }catch(err){
+    // Terugvaloptie voor omgevingen zonder toegang tot de Clipboard API
+    const textarea = document.createElement("textarea");
+    textarea.value = currentArticleText;
+    textarea.style.position = "fixed";
+    textarea.style.opacity = "0";
+    document.body.appendChild(textarea);
+    textarea.select();
+    try{
+      document.execCommand("copy");
+      showToast("Scenario gekopieerd naar klembord");
+    }catch(e){
+      showToast("Kon niet kopiëren — selecteer de tekst handmatig");
+    }
+    document.body.removeChild(textarea);
+  }
+}
+
+/* ---------- EVENT-KOPPELING ---------- */
+
+generateBtn.addEventListener("click", generateScenario);
+shareBtn.addEventListener("click", shareScenario);
+
+</script>
+</body>
+</html>
